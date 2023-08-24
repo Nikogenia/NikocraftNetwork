@@ -1,0 +1,5 @@
+# GLOBAL .gitignore
+
+# Jetbrains IDE files
+**/.idea
+
