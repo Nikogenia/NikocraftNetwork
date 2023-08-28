@@ -19,9 +19,7 @@ public class APIServer extends Thread {
 
     public APIServer() {
 
-        super("Server Thread");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(this::exit));
+        super("API Server Thread");
 
         clients = new ArrayList<>();
 
@@ -29,6 +27,7 @@ public class APIServer extends Thread {
 
             server = new ServerSocket(Main.getAPIConfiguration().getPort());
             server.setSoTimeout(1000);
+            running = true;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,8 +39,6 @@ public class APIServer extends Thread {
     public void run() {
 
         System.out.println("Started listening for API client on " + server.getLocalPort() + ".");
-
-        running = true;
 
         while (running) {
 
@@ -98,7 +95,9 @@ public class APIServer extends Thread {
 
     }
 
-    public void setRunning(boolean running) { this.running = running; }
+    public boolean isRunning() {
+        return running;
+    }
 
     public List<APIClient> getClients() { return clients; }
 

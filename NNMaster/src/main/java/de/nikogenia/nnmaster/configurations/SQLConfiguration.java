@@ -4,11 +4,11 @@ import de.nikogenia.nnmaster.utils.Configuration;
 
 public class SQLConfiguration extends Configuration {
 
-    private String ip;
-    private Integer port;
-    private String schema;
-    private String user;
-    private String password;
+    private String ip = "";
+    private Integer port = 3306;
+    private String database = "";
+    private String user = "";
+    private String password = "";
 
     public String getIp() {
         return ip;
@@ -26,12 +26,12 @@ public class SQLConfiguration extends Configuration {
         this.port = port;
     }
 
-    public String getSchema() {
-        return schema;
+    public String getDatabase() {
+        return database;
     }
 
-    public void setSchema(String schema) {
-        this.schema = schema;
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
     public String getUser() {

@@ -3,27 +3,24 @@ package de.nikogenia.nnmaster;
 import de.nikogenia.nnmaster.api.APIServer;
 import de.nikogenia.nnmaster.configurations.APIConfiguration;
 import de.nikogenia.nnmaster.configurations.SQLConfiguration;
+import de.nikogenia.nnmaster.sql.SQLManager;
 import de.nikogenia.nnmaster.utils.Configuration;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 public class Main {
 
     private static Main instance;
 
-    public static final String NAME = "Nikocraft Network";
+    public static final String NAME = "NikocraftNetwork";
     public static final String VERSION = "Alpha-0.0.1";
     public static final String AUTHOR = "Nikogenia";
-    public static final String API_VERSION = "Nikogenia";
+    public static final String API_VERSION = "1.0";
 
     private SQLConfiguration sqlConfiguration;
     private APIConfiguration apiConfiguration;
 
     private APIServer apiServer;
 
-    private Connection connection;
-    private Statement statement;
+    private SQLManager sqlManager;
 
     public static void main(String[] args) {
 
@@ -37,6 +34,8 @@ public class Main {
             }
         }
 
+        System.out.println("Start instance (debug mode: " + debug + ")");
+
         instance.run(debug);
 
     }
@@ -45,17 +44,30 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::exit));
 
+        System.out.println("Load configurations");
         sqlConfiguration = (SQLConfiguration) Configuration.load("./configs/SQLConfiguration.yaml", SQLConfiguration.class);
         sqlConfiguration.save("./configs/SQLConfiguration.yaml");
         apiConfiguration = (APIConfiguration) Configuration.load("./configs/APIConfiguration.yaml", APIConfiguration.class);
         apiConfiguration.save("./configs/APIConfiguration.yaml");
 
+        System.out.println("Load SQL manager");
+        sqlManager = new SQLManager();
+        if (!sqlManager.isConnected()) return;
+
+        System.out.println("Load API server");
         apiServer = new APIServer();
+        if (!apiServer.isRunning()) return;
         apiServer.start();
 
     }
 
     public void exit() {
+
+        if (apiServer != null) apiServer.exit();
+
+        if (sqlManager != null) sqlManager.exit();
+
+        System.out.println("Exited.");
 
     }
 
@@ -66,5 +78,7 @@ public class Main {
     public static APIConfiguration getAPIConfiguration() { return instance.apiConfiguration; }
 
     public static APIServer getAPIServer() { return instance.apiServer; }
+
+    public static SQLManager getSQLManager() {return instance.sqlManager; }
 
 }

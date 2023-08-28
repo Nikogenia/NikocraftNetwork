@@ -31,7 +31,7 @@ public class APIClient extends Thread {
 
     public APIClient(Socket socket) {
 
-        super("Client Thread - " + socket.getRemoteSocketAddress());
+        super("API Client Thread - " + socket.getRemoteSocketAddress());
 
         this.socket = socket;
 
@@ -96,14 +96,14 @@ public class APIClient extends Thread {
 
             if (received == null) {
                 if (!closed) {
-                    System.out.println("Connection from " + socket.getRemoteSocketAddress() + " lost. Connection error ...");
+                    System.out.println("API Connection from " + socket.getRemoteSocketAddress() + " lost. Connection error ...");
                     exit();
                 }
                 return;
             }
 
             if (received.getLeft().equals(APIMessage.DISCONNECT)) {
-                System.out.println("Connection from " + socket.getRemoteSocketAddress() + " lost. Disconnect ...");
+                System.out.println("API Connection from " + socket.getRemoteSocketAddress() + " lost. Disconnect ...");
                 exit();
                 return;
             }
@@ -139,6 +139,7 @@ public class APIClient extends Thread {
         if (connected) Main.getAPIServer().getClients().remove(this);
 
         connected = false;
+        closed = true;
 
         try {
 

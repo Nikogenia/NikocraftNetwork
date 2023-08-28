@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 public enum APIMessage {
 
-    AUTH,
     INVALID_ID,
     INVALID_KEY,
     AUTH_SUCCESSFUL,
