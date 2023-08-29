@@ -24,11 +24,50 @@ public class SQLManager {
 
             statement = connection.createStatement();
 
+            createTables();
+
             connected = true;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void createTables() throws SQLException {
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS general (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(64) NOT NULL UNIQUE,
+                    value LONGTEXT DEFAULT null
+                );
+                """);
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS server (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(32) NOT NULL UNIQUE,
+                    enabled BOOLEAN NOT NULL DEFAULT false,
+                    created TIMESTAMP NOT NULL DEFAULT current_timestamp,
+                    mode TINYINT NOT NULL DEFAULT 0
+                );
+                """);
+
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS player (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    uuid CHAR(36) NOT NULL UNIQUE,
+                    name VARCHAR(16) NOT NULL UNIQUE,
+                    online BOOLEAN NOT NULL DEFAULT false,
+                    server BIGINT UNSIGNED NOT NULL DEFAULT 1,
+                    time_played INT UNSIGNED NOT NULL DEFAULT 0,
+                    first_joined TIMESTAMP DEFAULT null,
+                    number_joined INT UNSIGNED NOT NULL DEFAULT 0,
+                    last_disconnect TIMESTAMP DEFAULT null,
+                    FOREIGN KEY (server) REFERENCES server(id)
+                );
+                """);
 
     }
 
