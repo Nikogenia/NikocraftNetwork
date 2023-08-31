@@ -1,8 +1,8 @@
-package de.nikogenia.nnmaster.configurations;
+package de.nikogenia.nnmaster.config;
 
-import de.nikogenia.nnmaster.utils.Configuration;
+import de.nikogenia.nnmaster.utils.FileConfig;
 
-public class SQLConfiguration extends Configuration {
+public class SQLConfig extends FileConfig {
 
     private String ip = "";
     private Integer port = 3306;

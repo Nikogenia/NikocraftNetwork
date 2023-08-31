@@ -3,3 +3,5 @@
 # Jetbrains IDE files
 **/.idea
 
+# Test Environment
+Test/

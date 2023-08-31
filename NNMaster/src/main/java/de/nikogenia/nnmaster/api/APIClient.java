@@ -78,7 +78,7 @@ public class APIClient extends Thread {
 
         output.writeUTF(encryptedKey);
 
-        if (!Main.getAPIConfiguration().getKey().equals(receive().getRight())) {
+        if (!Main.getGeneralConfig().getAPIKey().equals(receive().getRight())) {
             send(APIMessage.INVALID_KEY);
             return false;
         }

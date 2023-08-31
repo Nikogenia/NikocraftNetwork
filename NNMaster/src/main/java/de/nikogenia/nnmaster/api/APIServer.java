@@ -25,7 +25,7 @@ public class APIServer extends Thread {
 
         try {
 
-            server = new ServerSocket(Main.getAPIConfiguration().getPort());
+            server = new ServerSocket(Main.getGeneralConfig().getAPIPort());
             server.setSoTimeout(1000);
             running = true;
 

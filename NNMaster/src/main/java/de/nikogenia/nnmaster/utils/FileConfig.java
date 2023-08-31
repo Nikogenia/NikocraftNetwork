@@ -11,11 +11,11 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class Configuration {
+public abstract class FileConfig {
 
-    public static Configuration load(String path, Class<?> type) {
+    public static FileConfig load(String path, Class<?> type) {
 
-        Configuration configuration = null;
+        FileConfig fileConfig = null;
 
         Yaml yaml = new Yaml();
 
@@ -32,21 +32,21 @@ public abstract class Configuration {
 
             InputStream in = new FileInputStream(file);
 
-            configuration = (Configuration) yaml.loadAs(in, type);
+            fileConfig = (FileConfig) yaml.loadAs(in, type);
 
         } catch(Exception e) {
             e.printStackTrace();
         }
 
-        if (configuration == null) {
+        if (fileConfig == null) {
             try {
-                configuration = (Configuration) type.getDeclaredConstructor().newInstance();
+                fileConfig = (FileConfig) type.getDeclaredConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
         }
 
-        return configuration;
+        return fileConfig;
 
     }
 

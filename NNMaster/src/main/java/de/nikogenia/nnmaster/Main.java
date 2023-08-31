@@ -1,10 +1,12 @@
 package de.nikogenia.nnmaster;
 
 import de.nikogenia.nnmaster.api.APIServer;
-import de.nikogenia.nnmaster.configurations.APIConfiguration;
-import de.nikogenia.nnmaster.configurations.SQLConfiguration;
+import de.nikogenia.nnmaster.config.GeneralConfig;
+import de.nikogenia.nnmaster.config.SQLConfig;
+import de.nikogenia.nnmaster.docker.DockerManager;
+import de.nikogenia.nnmaster.server.ServerManager;
 import de.nikogenia.nnmaster.sql.SQLManager;
-import de.nikogenia.nnmaster.utils.Configuration;
+import de.nikogenia.nnmaster.utils.FileConfig;
 
 public class Main {
 
@@ -15,12 +17,16 @@ public class Main {
     public static final String AUTHOR = "Nikogenia";
     public static final String API_VERSION = "1.0";
 
-    private SQLConfiguration sqlConfiguration;
-    private APIConfiguration apiConfiguration;
+    private SQLConfig sqlConfig;
+    private GeneralConfig generalConfig;
+
+    private SQLManager sqlManager;
 
     private APIServer apiServer;
 
-    private SQLManager sqlManager;
+    private DockerManager dockerManager;
+
+    private ServerManager serverManager;
 
     public static void main(String[] args) {
 
@@ -45,10 +51,9 @@ public class Main {
         Runtime.getRuntime().addShutdownHook(new Thread(this::exit));
 
         System.out.println("Load configurations");
-        sqlConfiguration = (SQLConfiguration) Configuration.load("./configs/SQLConfiguration.yaml", SQLConfiguration.class);
-        sqlConfiguration.save("./configs/SQLConfiguration.yaml");
-        apiConfiguration = (APIConfiguration) Configuration.load("./configs/APIConfiguration.yaml", APIConfiguration.class);
-        apiConfiguration.save("./configs/APIConfiguration.yaml");
+        sqlConfig = (SQLConfig) FileConfig.load("./configs/SQLConfig.yaml", SQLConfig.class);
+        sqlConfig.save("./configs/SQLConfig.yaml");
+        generalConfig = new GeneralConfig();
 
         System.out.println("Load SQL manager");
         sqlManager = new SQLManager();
@@ -59,11 +64,24 @@ public class Main {
         if (!apiServer.isRunning()) return;
         apiServer.start();
 
+        System.out.println("Load Docker manager");
+        dockerManager = new DockerManager();
+        if (!dockerManager.isConnected()) return;
+
+        System.out.println("Load server manager");
+        serverManager = new ServerManager();
+
+        System.out.println("Loaded.");
+
     }
 
     public void exit() {
 
         if (apiServer != null) apiServer.exit();
+
+        if (serverManager != null) serverManager.exit();
+
+        if (dockerManager != null) dockerManager.exit();
 
         if (sqlManager != null) sqlManager.exit();
 
@@ -73,12 +91,16 @@ public class Main {
 
     public static Main getInstance() { return instance; }
 
-    public static SQLConfiguration getSQLConfiguration() { return instance.sqlConfiguration; }
+    public static SQLConfig getSQLConfig() { return instance.sqlConfig; }
 
-    public static APIConfiguration getAPIConfiguration() { return instance.apiConfiguration; }
+    public static GeneralConfig getGeneralConfig() { return instance.generalConfig; }
+
+    public static SQLManager getSQLManager() { return instance.sqlManager; }
 
     public static APIServer getAPIServer() { return instance.apiServer; }
 
-    public static SQLManager getSQLManager() {return instance.sqlManager; }
+    public static DockerManager getDockerManager() { return instance.dockerManager; }
+
+    public static ServerManager getServerManager() { return instance.serverManager; }
 
 }

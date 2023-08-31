@@ -1,11 +1,9 @@
 package de.nikogenia.nnmaster.sql;
 
 import de.nikogenia.nnmaster.Main;
+import org.apache.commons.lang3.RandomStringUtils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class SQLManager {
 
@@ -18,13 +16,15 @@ public class SQLManager {
 
         try {
 
-            connection = DriverManager.getConnection("jdbc:mysql://" + Main.getSQLConfiguration().getIp() +
-                    ":" + Main.getSQLConfiguration().getPort() + "/" + Main.getSQLConfiguration().getDatabase(),
-                    Main.getSQLConfiguration().getUser(), Main.getSQLConfiguration().getPassword());
+            connection = DriverManager.getConnection("jdbc:mysql://" + Main.getSQLConfig().getIp() +
+                    ":" + Main.getSQLConfig().getPort() + "/" + Main.getSQLConfig().getDatabase(),
+                    Main.getSQLConfig().getUser(), Main.getSQLConfig().getPassword());
 
             statement = connection.createStatement();
 
             createTables();
+
+            loadGeneralConfig();
 
             connected = true;
 
@@ -34,7 +34,7 @@ public class SQLManager {
 
     }
 
-    private void createTables() throws SQLException {
+    public void createTables() throws SQLException {
 
         statement.execute("""
                 CREATE TABLE IF NOT EXISTS general (
@@ -68,6 +68,46 @@ public class SQLManager {
                     FOREIGN KEY (server) REFERENCES server(id)
                 );
                 """);
+
+    }
+
+    public void loadGeneralConfig() throws SQLException {
+
+        Main.getGeneralConfig().setAPIPort(Integer.parseInt(loadGeneralConfigEntry("api_port", "42420")));
+        Main.getGeneralConfig().setAPIKey(loadGeneralConfigEntry("api_key", RandomStringUtils.randomAlphanumeric(32)));
+        Main.getGeneralConfig().setName(loadGeneralConfigEntry("name", "pixplex"));
+        Main.getGeneralConfig().setFullName(loadGeneralConfigEntry("full_name", "PixPlex"));
+        Main.getGeneralConfig().setDockerPrefix(loadGeneralConfigEntry("docker_prefix", Main.getGeneralConfig().getName() + "-"));
+        Main.getGeneralConfig().setRootPath(loadGeneralConfigEntry("root_path", "/root/pixplex/"));
+
+    }
+
+    public String loadGeneralConfigEntry(String name, String defaultValue) throws SQLException {
+
+        PreparedStatement stmt = connection.prepareStatement("""
+                SELECT value FROM general WHERE name = ?;
+                """);
+        stmt.setString(1, name);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) return rs.getString("value");
+
+        saveGeneralConfigEntry(name, defaultValue);
+
+        return defaultValue;
+
+    }
+
+    public void saveGeneralConfigEntry(String name, String value) throws SQLException {
+
+        PreparedStatement stmt = connection.prepareStatement("""
+                INSERT INTO general (name, value) VALUES (?, ?)
+                ON DUPLICATE KEY UPDATE value = ?;
+                """);
+        stmt.setString(1, name);
+        stmt.setString(2, value);
+        stmt.setString(3, value);
+        stmt.executeUpdate();
 
     }
 
