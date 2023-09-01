@@ -1,0 +1,5 @@
+name: NNProxy
+version: '${project.version}'
+main: de.nikogenia.nnproxy.Main
+author: Nikogenia
+description: The BungeeCord plugin for the proxy of the Nikocraft network engine
