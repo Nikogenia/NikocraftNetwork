@@ -10,7 +10,7 @@ import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.core.DockerClientBuilder;
 import de.nikogenia.nnmaster.Main;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,16 +90,6 @@ public class DockerManager {
                 } catch (NotModifiedException ignored) {}
 
                 return;
-
-            }
-        }
-
-    }
-
-    public void attachContainer(String name) {
-
-        for (Container container : getContainers()) {
-            if (container.getNames()[0].equals("/" + name)) {
 
             }
         }

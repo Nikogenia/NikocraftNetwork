@@ -6,12 +6,12 @@
 
     <groupId>de.nikogenia</groupId>
     <artifactId>nnmaster</artifactId>
-    <version>Alpha-0.0.1</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>Nikocraft Network Master</name>
+    <name>NNMaster</name>
 
-    <description>The master of the nikocraft network engine</description>
+    <description>The master of the Nikocraft network engine</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

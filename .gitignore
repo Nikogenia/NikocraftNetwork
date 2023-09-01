@@ -3,5 +3,11 @@
 # Jetbrains IDE files
 **/.idea
 
-# Test Environment
+# IML files
+**/*.iml
+
+# Target directories
+**/target/
+
+# Test environment
 Test/

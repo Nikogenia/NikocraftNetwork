@@ -18,7 +18,7 @@ public class Main {
     private static Main instance;
 
     public static final String NAME = "NikocraftNetwork";
-    public static final String VERSION = "Alpha-0.0.1";
+    public static final String VERSION = "0.0.1";
     public static final String AUTHOR = "Nikogenia";
     public static final String API_VERSION = "1.0";
 
