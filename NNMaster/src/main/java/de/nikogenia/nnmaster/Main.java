@@ -83,7 +83,7 @@ public class Main {
         serverManager = new ServerManager();
 
         System.out.println("Start servers");
-        serverManager.startServers();
+        serverManager.run();
 
     }
 
