@@ -8,6 +8,11 @@ import de.nikogenia.nnmaster.server.ServerManager;
 import de.nikogenia.nnmaster.sql.SQLManager;
 import de.nikogenia.nnmaster.utils.FileConfig;
 
+import java.time.ZoneId;
+import java.time.format.TextStyle;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class Main {
 
     private static Main instance;
@@ -20,6 +25,8 @@ public class Main {
     private SQLConfig sqlConfig;
     private GeneralConfig generalConfig;
 
+    private ZoneId timeZone;
+
     private SQLManager sqlManager;
 
     private APIServer apiServer;
@@ -27,6 +34,7 @@ public class Main {
     private DockerManager dockerManager;
 
     private ServerManager serverManager;
+
 
     public static void main(String[] args) {
 
@@ -59,6 +67,9 @@ public class Main {
         sqlManager = new SQLManager();
         if (!sqlManager.isConnected()) return;
 
+        timeZone = ZoneId.of(generalConfig.getTimeZone());
+        System.out.println("Using time zone " + timeZone.getId());
+
         System.out.println("Load API server");
         apiServer = new APIServer();
         if (!apiServer.isRunning()) return;
@@ -71,7 +82,8 @@ public class Main {
         System.out.println("Load server manager");
         serverManager = new ServerManager();
 
-        System.out.println("Loaded.");
+        System.out.println("Start servers");
+        serverManager.startServers();
 
     }
 
@@ -85,7 +97,7 @@ public class Main {
 
         if (sqlManager != null) sqlManager.exit();
 
-        System.out.println("Exited.");
+        System.out.println("Exited");
 
     }
 
@@ -94,6 +106,8 @@ public class Main {
     public static SQLConfig getSQLConfig() { return instance.sqlConfig; }
 
     public static GeneralConfig getGeneralConfig() { return instance.generalConfig; }
+
+    public static ZoneId getTimeZone() { return instance.timeZone; }
 
     public static SQLManager getSQLManager() { return instance.sqlManager; }
 

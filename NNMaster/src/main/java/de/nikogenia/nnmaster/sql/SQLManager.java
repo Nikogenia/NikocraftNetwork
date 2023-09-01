@@ -48,9 +48,12 @@ public class SQLManager {
                 CREATE TABLE IF NOT EXISTS server (
                     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     name VARCHAR(32) NOT NULL UNIQUE,
+                    address VARCHAR(15) NOT NULL UNIQUE,
+                    agent VARCHAR(32) NOT NULL DEFAULT 'master',
+                    type VARCHAR(32) NOT NULL DEFAULT 'paper',
                     enabled BOOLEAN NOT NULL DEFAULT false,
                     created TIMESTAMP NOT NULL DEFAULT current_timestamp,
-                    mode TINYINT NOT NULL DEFAULT 0
+                    mode VARCHAR(32) NOT NULL DEFAULT 'off'
                 );
                 """);
 
@@ -77,8 +80,10 @@ public class SQLManager {
         Main.getGeneralConfig().setAPIKey(loadGeneralConfigEntry("api_key", RandomStringUtils.randomAlphanumeric(32)));
         Main.getGeneralConfig().setName(loadGeneralConfigEntry("name", "pixplex"));
         Main.getGeneralConfig().setFullName(loadGeneralConfigEntry("full_name", "PixPlex"));
-        Main.getGeneralConfig().setDockerPrefix(loadGeneralConfigEntry("docker_prefix", Main.getGeneralConfig().getName() + "-"));
+        Main.getGeneralConfig().setDockerPrefix(loadGeneralConfigEntry("docker_prefix", "pixplex-"));
         Main.getGeneralConfig().setRootPath(loadGeneralConfigEntry("root_path", "/root/pixplex/"));
+        Main.getGeneralConfig().setDockerNetwork(loadGeneralConfigEntry("docker_network", "pixplex"));
+        Main.getGeneralConfig().setTimeZone(loadGeneralConfigEntry("time_zone", "Europe/Berlin"));
 
     }
 
@@ -111,6 +116,12 @@ public class SQLManager {
 
     }
 
+    public PreparedStatement getPreparedStatement(String sql) throws SQLException {
+
+        return connection.prepareStatement(sql);
+
+    }
+
     public void exit() {
 
         try {
@@ -124,6 +135,10 @@ public class SQLManager {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public Statement getStatement() {
+        return statement;
     }
 
 }

@@ -7,8 +7,13 @@ public class GeneralConfig {
 
     private String name;
     private String fullName;
-    private String dockerPrefix;
+
     private String rootPath;
+
+    private String dockerNetwork;
+    private String dockerPrefix;
+
+    private String timeZone;
 
     public Integer getAPIPort() {
         return apiPort;
@@ -56,6 +61,22 @@ public class GeneralConfig {
 
     public void setRootPath(String rootPath) {
         this.rootPath = rootPath;
+    }
+
+    public String getDockerNetwork() {
+        return dockerNetwork;
+    }
+
+    public void setDockerNetwork(String dockerNetwork) {
+        this.dockerNetwork = dockerNetwork;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
 }
