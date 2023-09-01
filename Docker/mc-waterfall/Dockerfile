@@ -7,6 +7,6 @@ RUN apt install curl -y
 
 RUN apt install openjdk-17-jdk-headless -y
 
-WORKDIR /master
+WORKDIR /proxy
 
 ENTRYPOINT [ "./start.sh" ]

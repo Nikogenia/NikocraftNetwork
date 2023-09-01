@@ -1,14 +1,14 @@
 #!/bin/bash
 
-echo "--------------------"
+echo "----------------------------------------"
 echo "Java Version"
-echo "--------------------"
+echo "----------------------------------------"
 
 java --version
 
-echo "--------------------"
+echo "----------------------------------------"
 echo "Start paper.jar ..."
-echo "--------------------"
+echo "----------------------------------------"
 
 exec java -Xms2048M -Xmx2048M --add-modules=jdk.incubator.vector -XX:+UseG1GC \
     -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions \
