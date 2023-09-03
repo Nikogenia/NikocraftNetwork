@@ -78,6 +78,7 @@ public class SQLManager {
 
         Main.getGeneralConfig().setAPIPort(Integer.parseInt(loadGeneralConfigEntry("api_port", "42420")));
         Main.getGeneralConfig().setAPIKey(loadGeneralConfigEntry("api_key", RandomStringUtils.randomAlphanumeric(32)));
+        Main.getGeneralConfig().setAPIConnectionRetry(Integer.parseInt(loadGeneralConfigEntry("api_connection_retry", "10")));
         Main.getGeneralConfig().setName(loadGeneralConfigEntry("name", "pixplex"));
         Main.getGeneralConfig().setFullName(loadGeneralConfigEntry("full_name", "PixPlex"));
         Main.getGeneralConfig().setDockerPrefix(loadGeneralConfigEntry("docker_prefix", "pixplex-"));

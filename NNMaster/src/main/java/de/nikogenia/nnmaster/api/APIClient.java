@@ -47,7 +47,7 @@ public class APIClient extends Thread {
             output = new DataOutputStream(socket.getOutputStream());
 
             if (!initialize()) {
-                exit();
+                exit(true);
                 return;
             }
 
@@ -55,7 +55,7 @@ public class APIClient extends Thread {
 
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
-            exit();
+            exit(true);
             return;
         }
 
@@ -113,14 +113,14 @@ public class APIClient extends Thread {
             if (received == null) {
                 if (!closed) {
                     Main.getLogger().info("API Connection from " + socket.getRemoteSocketAddress() + " lost. Connection error ...");
-                    exit();
+                    exit(true);
                 }
                 return;
             }
 
             if (received.getLeft().equals(APIMessage.DISCONNECT)) {
                 Main.getLogger().info("API Connection from " + socket.getRemoteSocketAddress() + " lost. Disconnect ...");
-                exit();
+                exit(true);
                 return;
             }
 
@@ -130,9 +130,9 @@ public class APIClient extends Thread {
 
     }
 
-    public void exit() {
+    public void exit(boolean remove) {
 
-        if (connected) Main.getAPIServer().getClients().remove(this);
+        if (connected & remove) Main.getAPIServer().getClients().remove(this);
 
         connected = false;
         closed = true;
@@ -145,7 +145,7 @@ public class APIClient extends Thread {
             socket.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.getLogger().warning("Failed to close socket: " + e);
         }
 
     }
@@ -161,7 +161,7 @@ public class APIClient extends Thread {
             output.writeUTF(encrypted);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.getLogger().warning("Failed to send message: " + e);
         }
 
     }
@@ -189,7 +189,7 @@ public class APIClient extends Thread {
             }
             catch (SocketTimeoutException ignored) {}
             catch (IOException | IndexOutOfBoundsException e) {
-                e.printStackTrace();
+                Main.getLogger().warning("Failed to receive message: " + e);
                 return null;
             }
 

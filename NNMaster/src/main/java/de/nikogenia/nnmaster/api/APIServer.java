@@ -91,7 +91,7 @@ public class APIServer extends Thread {
 
             client.send(APIMessage.CLOSED);
 
-            client.exit();
+            client.exit(false);
 
         }
 

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.*;
 
 public class Main {
@@ -27,6 +28,8 @@ public class Main {
     private boolean debug;
 
     private Logger logger;
+
+    private ReentrantLock lock;
 
     private SQLConfig sqlConfig;
     private GeneralConfig generalConfig;
@@ -59,6 +62,8 @@ public class Main {
     }
 
     public void run() {
+
+        lock = new ReentrantLock();
 
         if (!initializeLogger()) System.exit(1);
 

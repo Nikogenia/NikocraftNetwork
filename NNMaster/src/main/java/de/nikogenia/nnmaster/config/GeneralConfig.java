@@ -4,6 +4,7 @@ public class GeneralConfig {
 
     private Integer apiPort;
     private String apiKey;
+    private Integer apiConnectionRetry;
 
     private String name;
     private String fullName;
@@ -77,6 +78,14 @@ public class GeneralConfig {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public Integer getAPIConnectionRetry() {
+        return apiConnectionRetry;
+    }
+
+    public void setAPIConnectionRetry(Integer apiConnectionRetry) {
+        this.apiConnectionRetry = apiConnectionRetry;
     }
 
 }
