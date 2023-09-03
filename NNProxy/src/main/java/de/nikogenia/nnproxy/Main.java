@@ -1,5 +1,6 @@
 package de.nikogenia.nnproxy;
 
+import de.nikogenia.nnproxy.api.APIClient;
 import de.nikogenia.nnproxy.config.APIConfig;
 import de.nikogenia.nnproxy.config.GeneralConfig;
 import de.nikogenia.nnproxy.config.SQLConfig;
@@ -7,7 +8,9 @@ import de.nikogenia.nnproxy.sql.SQLManager;
 import de.nikogenia.nnproxy.utils.FileConfig;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.net.InetSocketAddress;
 import java.time.ZoneId;
+import java.util.logging.Logger;
 
 public final class Main extends Plugin {
 
@@ -26,35 +29,40 @@ public final class Main extends Plugin {
 
     private SQLManager sqlManager;
 
+    private APIClient apiClient;
+
     @Override
     public void onEnable() {
 
         instance = this;
 
-        System.out.println("Load configurations");
+        getLogger().info("Load configurations");
         sqlConfig = (SQLConfig) FileConfig.load("./configs/SQLConfig.yaml", SQLConfig.class);
         sqlConfig.save("./configs/SQLConfig.yaml");
         apiConfig = (APIConfig) FileConfig.load("./configs/APIConfig.yaml", APIConfig.class);
         apiConfig.save("./configs/APIConfig.yaml");
         generalConfig = new GeneralConfig();
 
-        System.out.println("Load SQL manager");
+        getLogger().info("Load SQL manager");
         sqlManager = new SQLManager();
         if (!sqlManager.isConnected()) return;
 
         timeZone = ZoneId.of(generalConfig.getTimeZone());
-        System.out.println("Using time zone " + timeZone.getId());
+        getLogger().info("Using time zone " + timeZone.getId());
 
-
+        apiClient = new APIClient();
+        apiClient.start();
 
     }
 
     @Override
     public void onDisable() {
 
+        if (apiClient != null) apiClient.exit();
+
         if (sqlManager != null) sqlManager.exit();
 
-        System.out.println("Exited");
+        getLogger().info("Exited");
 
     }
 
@@ -69,5 +77,7 @@ public final class Main extends Plugin {
     public static ZoneId getTimeZone() { return instance.timeZone; }
 
     public static SQLManager getSQLManager() { return instance.sqlManager; }
+
+    public static APIClient getAPIClient() { return instance.apiClient; }
 
 }
