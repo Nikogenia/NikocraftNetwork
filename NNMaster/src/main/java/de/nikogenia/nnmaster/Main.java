@@ -8,10 +8,12 @@ import de.nikogenia.nnmaster.server.ServerManager;
 import de.nikogenia.nnmaster.sql.SQLManager;
 import de.nikogenia.nnmaster.utils.FileConfig;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.TextStyle;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.time.format.DateTimeFormatter;
+import java.util.logging.*;
 
 public class Main {
 
@@ -21,6 +23,10 @@ public class Main {
     public static final String VERSION = "0.0.1";
     public static final String AUTHOR = "Nikogenia";
     public static final String API_VERSION = "1.0";
+
+    private boolean debug;
+
+    private Logger logger;
 
     private SQLConfig sqlConfig;
     private GeneralConfig generalConfig;
@@ -40,68 +46,145 @@ public class Main {
 
         instance = new Main();
 
-        boolean debug = false;
+        instance.debug = false;
         for (String arg : args) {
             if (arg.equals("-d") | arg.equals("--debug")) {
-                debug = true;
+                instance.debug = true;
                 break;
             }
         }
 
-        System.out.println("Start instance (debug mode: " + debug + ")");
-
-        instance.run(debug);
+        instance.run();
 
     }
 
-    public void run(boolean debug) {
+    public void run() {
+
+        if (!initializeLogger()) System.exit(1);
+
+        logger.info("Author: " + AUTHOR);
+        logger.info("Version: " + VERSION);
+        logger.info("API version: " + API_VERSION);
+        logger.info("Debug mode: " + debug);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::exit));
 
-        System.out.println("Load configurations");
+        logger.info("Load configurations");
         sqlConfig = (SQLConfig) FileConfig.load("./configs/SQLConfig.yaml", SQLConfig.class);
         sqlConfig.save("./configs/SQLConfig.yaml");
         generalConfig = new GeneralConfig();
 
-        System.out.println("Load SQL manager");
+        logger.info("Load SQL manager");
         sqlManager = new SQLManager();
         if (!sqlManager.isConnected()) return;
 
         timeZone = ZoneId.of(generalConfig.getTimeZone());
-        System.out.println("Using time zone " + timeZone.getId());
+        logger.info("Using time zone " + timeZone.getId());
 
-        System.out.println("Load API server");
+        logger.info("Load API server");
         apiServer = new APIServer();
         if (!apiServer.isRunning()) return;
         apiServer.start();
 
-        System.out.println("Load Docker manager");
+        logger.info("Load Docker manager");
         dockerManager = new DockerManager();
         if (!dockerManager.isConnected()) return;
 
-        System.out.println("Load server manager");
+        logger.info("Load server manager");
         serverManager = new ServerManager();
 
-        System.out.println("Start servers");
+        logger.info("Start servers");
         serverManager.run();
 
     }
 
     public void exit() {
 
-        if (apiServer != null) apiServer.exit();
+        try {
 
-        if (serverManager != null) serverManager.exit();
+            if (apiServer != null) apiServer.exit();
 
-        if (dockerManager != null) dockerManager.exit();
+            if (serverManager != null) serverManager.exit();
 
-        if (sqlManager != null) sqlManager.exit();
+            if (dockerManager != null) dockerManager.exit();
 
-        System.out.println("Exited");
+            if (sqlManager != null) sqlManager.exit();
+
+            logger.info("Exited");
+
+        }
+        finally {
+            CustomLogManager.resetFinally();
+        }
+
+    }
+
+    static {
+        System.setProperty("java.util.logging.manager", CustomLogManager.class.getName());
+    }
+
+    public static class CustomLogManager extends LogManager {
+        static CustomLogManager instance;
+        public CustomLogManager() { instance = this; }
+        @Override public void reset() {}
+        private void reset0() { super.reset(); }
+        public static void resetFinally() { instance.reset0(); }
+    }
+
+    private boolean initializeLogger() {
+
+        File loggingDirectory = new File("./logs");
+
+        if (!loggingDirectory.exists()) loggingDirectory.mkdirs();
+
+        logger = Logger.getLogger("Master");
+
+        if (debug) logger.setLevel(Level.FINEST);
+        else logger.setLevel(Level.CONFIG);
+
+        logger.setUseParentHandlers(false);
+
+        Formatter formatter = new Formatter() {
+
+            @Override
+            public String format(LogRecord record) {
+
+                String result = "[" + DateTimeFormatter.ofPattern("dd LLL HH:mm:ss").format(LocalDateTime.now()) + "] ";
+
+                result += "[" + record.getLevel() + "] ";
+
+                result += "[" + record.getLoggerName() + "] ";
+
+                return result + record.getMessage() + "\n";
+
+            }
+
+        };
+
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(logger.getLevel());
+        FileHandler fileHandler;
+        try {
+            fileHandler = new FileHandler("./logs/log_" + DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(LocalDateTime.now()) + ".log");
+        } catch (IOException e) {
+            System.out.println("SEVERE: Fatal error occurred on initializing main logger!");
+            e.printStackTrace();
+            return false;
+        }
+
+        consoleHandler.setFormatter(formatter);
+        fileHandler.setFormatter(formatter);
+
+        logger.addHandler(consoleHandler);
+        logger.addHandler(fileHandler);
+
+        return true;
 
     }
 
     public static Main getInstance() { return instance; }
+
+    public static Logger getLogger() { return instance.logger; }
 
     public static SQLConfig getSQLConfig() { return instance.sqlConfig; }
 

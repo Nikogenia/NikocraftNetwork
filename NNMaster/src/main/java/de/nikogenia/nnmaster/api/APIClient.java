@@ -96,14 +96,14 @@ public class APIClient extends Thread {
 
             if (received == null) {
                 if (!closed) {
-                    System.out.println("API Connection from " + socket.getRemoteSocketAddress() + " lost. Connection error ...");
+                    Main.getLogger().info("API Connection from " + socket.getRemoteSocketAddress() + " lost. Connection error ...");
                     exit();
                 }
                 return;
             }
 
             if (received.getLeft().equals(APIMessage.DISCONNECT)) {
-                System.out.println("API Connection from " + socket.getRemoteSocketAddress() + " lost. Disconnect ...");
+                Main.getLogger().info("API Connection from " + socket.getRemoteSocketAddress() + " lost. Disconnect ...");
                 exit();
                 return;
             }

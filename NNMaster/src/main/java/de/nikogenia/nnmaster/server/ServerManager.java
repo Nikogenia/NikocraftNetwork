@@ -16,7 +16,7 @@ public class ServerManager {
 
         servers = new ArrayList<>();
 
-        System.out.println("Load servers");
+        Main.getLogger().info("Load servers");
         loadServers();
 
     }
@@ -48,6 +48,10 @@ public class ServerManager {
                     servers.add(new PaperServer(name, address, type, enabled, created, mode));
                 }
 
+                if (type.equals("waterfall")) {
+                    servers.add(new WaterfallServer(name, address, type, enabled, created, mode));
+                }
+
             }
 
         } catch (SQLException e) {
@@ -59,7 +63,11 @@ public class ServerManager {
     public void run() {
 
         for (Server server : servers) {
+
+            if (server.isEnabled()) server.create();
+
             server.start();
+
         }
 
     }

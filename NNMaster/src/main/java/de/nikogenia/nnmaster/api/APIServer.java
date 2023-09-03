@@ -38,7 +38,7 @@ public class APIServer extends Thread {
     @Override
     public void run() {
 
-        System.out.println("Started listening for API client on " + server.getLocalPort() + ".");
+        Main.getLogger().info("Started listening for API client on " + server.getLocalPort() + ".");
 
         while (running) {
 
@@ -46,7 +46,7 @@ public class APIServer extends Thread {
 
                 Socket connection = server.accept();
 
-                System.out.println("New API client connection from " + connection.getRemoteSocketAddress() + " opened. Initialize ...");
+                Main.getLogger().info("New API client connection from " + connection.getRemoteSocketAddress() + " opened. Initialize ...");
 
                 APIClient client = new APIClient(connection);
 
@@ -56,10 +56,10 @@ public class APIServer extends Thread {
 
                     clients.add(client);
 
-                    System.out.println("API client connection from " + connection.getRemoteSocketAddress() + " successful. Client version: " + client.getVersion());
+                    Main.getLogger().info("API client connection from " + connection.getRemoteSocketAddress() + " successful. Client version: " + client.getVersion());
 
                 }
-                else System.out.println("API client connection from " + connection.getRemoteSocketAddress() + " failed.");
+                else Main.getLogger().info("API client connection from " + connection.getRemoteSocketAddress() + " failed.");
 
             } catch (SocketTimeoutException ignored) {
             } catch (IOException e) {
@@ -79,13 +79,13 @@ public class APIServer extends Thread {
 
     public void exit() {
 
-        System.out.println("Shutting down API server ...");
+        Main.getLogger().info("Shutting down API server ...");
 
         running = false;
 
         for (APIClient client : clients) {
 
-            System.out.println("API client connection from " + client.getSocket().getRemoteSocketAddress() + " closed. Server shutdown ...");
+            Main.getLogger().info("API client connection from " + client.getSocket().getRemoteSocketAddress() + " closed. Server shutdown ...");
 
             client.send(APIMessage.CLOSED);
 

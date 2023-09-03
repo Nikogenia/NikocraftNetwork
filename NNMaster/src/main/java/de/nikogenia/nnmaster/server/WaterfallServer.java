@@ -1,13 +1,17 @@
 package de.nikogenia.nnmaster.server;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.InternetProtocol;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import de.nikogenia.nnmaster.Main;
 
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
-public class PaperServer extends Server {
+public class WaterfallServer extends Server {
 
-    public PaperServer(String name, String address, String type, boolean enabled, Timestamp created, String mode) {
+    public WaterfallServer(String name, String address, String type, boolean enabled, Timestamp created, String mode) {
 
         super(name, address, type, enabled, created, mode);
 
@@ -20,13 +24,13 @@ public class PaperServer extends Server {
     public void create() {
 
         Main.getDockerManager().createContainer(
-                "nikogenia/mc-paper:latest",
+                "nikogenia/mc-waterfall:latest",
                 Main.getGeneralConfig().getDockerPrefix() + getName(),
                 Main.getGeneralConfig().getDockerNetwork(),
                 getAddress(),
-                false,
+                true,
                 new String[]{
-                        Main.getGeneralConfig().getRootPath() + getName() + ":/server",
+                        Main.getGeneralConfig().getRootPath() + getName() + ":/proxy",
                 }
         );
 

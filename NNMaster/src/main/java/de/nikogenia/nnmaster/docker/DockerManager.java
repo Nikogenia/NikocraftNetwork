@@ -3,10 +3,7 @@ package de.nikogenia.nnmaster.docker;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.PullImageResultCallback;
 import com.github.dockerjava.api.exception.NotModifiedException;
-import com.github.dockerjava.api.model.Binds;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Image;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
 import de.nikogenia.nnmaster.Main;
 
@@ -27,36 +24,50 @@ public class DockerManager {
         client = DockerClientBuilder.getInstance().build();
 
         for (Container container : getContainers()) {
-            System.out.println("Container: " + container.getId() + " | " + Arrays.toString(container.getNames()) + " | " + container.getImage() + " | " + container.getState());
+            Main.getLogger().fine("Container: " + container.getId() + " | " + Arrays.toString(container.getNames()) + " | " + container.getImage() + " | " + container.getState());
         }
 
         pullImages();
 
         for (Image image : getImages()) {
-            System.out.println("Image: " + image.getId() + " | " + Arrays.toString(image.getRepoTags()));
+            Main.getLogger().fine("Image: " + image.getId() + " | " + Arrays.toString(image.getRepoTags()));
         }
 
         connected = true;
 
     }
 
-    public void createContainer(String image, String name, String network, String address, String[] binds) {
+    public void createContainer(String image, String name, String network, String address, boolean exposePort, String[] binds) {
 
         for (Container container : getContainers()) {
             if (container.getNames()[0].equals("/" + name)) return;
         }
 
-        System.out.println("Create container " + name + " with address " + address);
+        Main.getLogger().info("Create container " + name + " with address " + address);
 
-        client.createContainerCmd(image)
-                .withName(name)
-                .withHostConfig(HostConfig
-                        .newHostConfig()
-                        .withNetworkMode(network)
-                        .withBinds(Binds.fromPrimitive(binds)))
-                .withIpv4Address(address)
-                .withStdinOpen(true)
-                .exec();
+        if (exposePort) {
+            ExposedPort exposedPort = new ExposedPort(25565, InternetProtocol.TCP);
+            client.createContainerCmd(image)
+                    .withExposedPorts(exposedPort)
+                    .withName(name)
+                    .withHostConfig(HostConfig.newHostConfig()
+                            .withNetworkMode(network)
+                            .withPortBindings(new PortBinding(new Ports.Binding("0.0.0.0", "25565/tcp"), exposedPort))
+                            .withBinds(Binds.fromPrimitive(binds)))
+                    .withIpv4Address(address)
+                    .withStdinOpen(true)
+                    .exec();
+        }
+        else {
+            client.createContainerCmd(image)
+                    .withName(name)
+                    .withHostConfig(HostConfig.newHostConfig()
+                            .withNetworkMode(network)
+                            .withBinds(Binds.fromPrimitive(binds)))
+                    .withIpv4Address(address)
+                    .withStdinOpen(true)
+                    .exec();
+        }
 
     }
 
@@ -65,7 +76,7 @@ public class DockerManager {
         for (Container container : getContainers()) {
             if (container.getNames()[0].equals("/" + name)) {
 
-                System.out.println("Start container " + name);
+                Main.getLogger().info("Start container " + name);
 
                 try {
                     client.startContainerCmd(container.getId()).exec();
@@ -83,7 +94,7 @@ public class DockerManager {
         for (Container container : getContainers()) {
             if (container.getNames()[0].equals("/" + name)) {
 
-                System.out.println("Stop container " + name);
+                Main.getLogger().info("Stop container " + name);
 
                 try {
                     client.stopContainerCmd(container.getId()).exec();
@@ -126,8 +137,10 @@ public class DockerManager {
         List<Image> sorted = new ArrayList<>();
 
         for (Image image : getAllImages()) {
-            if (image.getRepoTags()[0].startsWith("nikogenia/mc"))
-                sorted.add(image);
+            if (image.getRepoTags().length > 0) {
+                if (image.getRepoTags()[0].startsWith("nikogenia/mc"))
+                    sorted.add(image);
+            }
         }
 
         return sorted;
@@ -147,7 +160,7 @@ public class DockerManager {
     public void pullImage(String name, String tag) {
 
         try {
-            client.pullImageCmd(name).withTag(tag).exec(new PullImageResultCallback()).awaitCompletion(30, TimeUnit.SECONDS);
+            client.pullImageCmd(name).withTag(tag).exec(new PullImageResultCallback()).awaitCompletion(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -156,8 +169,9 @@ public class DockerManager {
 
     public void pullImages() {
 
-        System.out.println("Pull images");
+        Main.getLogger().info("Pull images");
         if (!isImageInstalled("nikogenia/mc-paper", "latest")) pullImage("nikogenia/mc-paper", "latest");
+        if (!isImageInstalled("nikogenia/mc-waterfall", "latest")) pullImage("nikogenia/mc-waterfall", "latest");
 
     }
 
