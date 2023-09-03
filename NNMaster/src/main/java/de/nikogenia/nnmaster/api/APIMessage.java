@@ -4,12 +4,13 @@ import java.util.Arrays;
 
 public enum APIMessage {
 
+    AUTH_ID,
+    AUTH_KEY,
     INVALID_ID,
     INVALID_KEY,
     AUTH_SUCCESSFUL,
 
     CLOSED,
-    KICKED,
     DISCONNECT,
 
     CONSOLE_LINE_UPDATE,

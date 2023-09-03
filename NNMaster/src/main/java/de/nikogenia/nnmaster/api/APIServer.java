@@ -1,6 +1,8 @@
 package de.nikogenia.nnmaster.api;
 
 import de.nikogenia.nnmaster.Main;
+import de.nikogenia.nnmaster.api.handler.ControlAPIHandler;
+import de.nikogenia.nnmaster.api.handler.ProxyAPIHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -100,5 +102,25 @@ public class APIServer extends Thread {
     }
 
     public List<APIClient> getClients() { return clients; }
+
+    public APIClient getProxy() {
+
+        for (APIClient client : clients) {
+            if (client.getHandler() instanceof ProxyAPIHandler) return client;
+        }
+
+        return null;
+
+    }
+
+    public APIClient getControl() {
+
+        for (APIClient client : clients) {
+            if (client.getHandler() instanceof ControlAPIHandler) return client;
+        }
+
+        return null;
+
+    }
 
 }

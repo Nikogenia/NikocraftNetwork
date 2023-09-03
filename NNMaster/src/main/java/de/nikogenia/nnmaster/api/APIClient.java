@@ -1,6 +1,8 @@
 package de.nikogenia.nnmaster.api;
 
 import de.nikogenia.nnmaster.Main;
+import de.nikogenia.nnmaster.api.handler.APIHandler;
+import de.nikogenia.nnmaster.api.handler.ProxyAPIHandler;
 import de.nikogenia.nnmaster.utils.AESUtils;
 import de.nikogenia.nnmaster.utils.RSAUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,6 +30,8 @@ public class APIClient extends Thread {
     private String apiVersion;
 
     private SecretKey key;
+
+    private APIHandler handler;
 
     public APIClient(Socket socket) {
 
@@ -78,6 +82,18 @@ public class APIClient extends Thread {
 
         output.writeUTF(encryptedKey);
 
+        String id = receive().getRight();
+        if (id.equals("control")) {
+
+        }
+        else if (id.equals("proxy")) {
+            handler = new ProxyAPIHandler(this);
+        }
+        else {
+            send(APIMessage.INVALID_ID);
+            return false;
+        }
+
         if (!Main.getGeneralConfig().getAPIKey().equals(receive().getRight())) {
             send(APIMessage.INVALID_KEY);
             return false;
@@ -108,27 +124,7 @@ public class APIClient extends Thread {
                 return;
             }
 
-            /*
-
-            if (received.getLeft().equals(APIMessage.CONSOLE_INPUT)) {
-
-                Main.getProxyProcess().write(received.getRight());
-
-            }
-
-            if (received.getLeft().equals(APIMessage.CONSOLE_OUTPUT)) {
-
-                send(APIMessage.CONSOLE_OUTPUT, Main.getProxyProcess().getOutputCache());
-
-            }
-
-            if (received.getLeft().equals(APIMessage.CONSOLE_HISTORY)) {
-
-                send(APIMessage.CONSOLE_HISTORY, String.join("\n", Main.getProxyProcess().getHistory()));
-
-            }
-
-            */
+            handler.receive();
 
         }
 
@@ -208,5 +204,7 @@ public class APIClient extends Thread {
     public String getAPIVersion() { return apiVersion; }
 
     public Socket getSocket() { return socket; }
+
+    public APIHandler getHandler() { return handler; }
 
 }
