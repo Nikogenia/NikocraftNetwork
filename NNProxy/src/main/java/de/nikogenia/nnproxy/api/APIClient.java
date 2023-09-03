@@ -124,6 +124,16 @@ public class APIClient extends Thread {
 
     }
 
+    private void timeout() {
+
+        try {
+            Thread.sleep(Main.getGeneralConfig().getAPIConnectionRetry() * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     public void run() {
 
@@ -132,15 +142,13 @@ public class APIClient extends Thread {
         while (running) {
 
             try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if (!connect()) continue;
+                if (!connect()) {
+                    timeout();
+                    continue;
+                }
             } catch (IOException e) {
                 Main.getInstance().getLogger().info("Connection failed! Connection error.");
+                timeout();
                 continue;
             }
 
@@ -158,6 +166,8 @@ public class APIClient extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            timeout();
 
         }
 

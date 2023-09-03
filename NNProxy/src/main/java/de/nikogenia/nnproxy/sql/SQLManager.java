@@ -41,6 +41,7 @@ public class SQLManager {
     public void loadGeneralConfig() throws SQLException {
 
         Main.getGeneralConfig().setAPIKey(loadGeneralConfigEntry("api_key", RandomStringUtils.randomAlphanumeric(32)));
+        Main.getGeneralConfig().setAPIConnectionRetry(Integer.parseInt(loadGeneralConfigEntry("api_connection_retry", "10")));
         Main.getGeneralConfig().setName(loadGeneralConfigEntry("name", "pixplex"));
         Main.getGeneralConfig().setFullName(loadGeneralConfigEntry("full_name", "PixPlex"));
         Main.getGeneralConfig().setTimeZone(loadGeneralConfigEntry("time_zone", "Europe/Berlin"));
