@@ -13,6 +13,8 @@ public enum APIMessage {
     CLOSED,
     DISCONNECT,
 
+    SERVER_LIST,
+
     CONSOLE_LINE_UPDATE,
     CONSOLE_INPUT,
     CONSOLE_OUTPUT,

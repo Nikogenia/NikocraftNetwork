@@ -72,6 +72,15 @@ public class SQLManager {
                 );
                 """);
 
+        statement.execute("""
+                CREATE TABLE IF NOT EXISTS motd (
+                    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(32) NOT NULL UNIQUE,
+                    line1 VARCHAR(255) NOT NULL,
+                    line2 VARCHAR(255) NOT NULL
+                );
+                """);
+
     }
 
     public void loadGeneralConfig() throws SQLException {
@@ -85,6 +94,7 @@ public class SQLManager {
         Main.getGeneralConfig().setRootPath(loadGeneralConfigEntry("root_path", "/root/pixplex/"));
         Main.getGeneralConfig().setDockerNetwork(loadGeneralConfigEntry("docker_network", "pixplex"));
         Main.getGeneralConfig().setTimeZone(loadGeneralConfigEntry("time_zone", "Europe/Berlin"));
+        Main.getGeneralConfig().setMotd(loadGeneralConfigEntry("motd", "default"));
 
     }
 

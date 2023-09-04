@@ -16,6 +16,8 @@ public class GeneralConfig {
 
     private String timeZone;
 
+    private String motd;
+
     public Integer getAPIPort() {
         return apiPort;
     }
@@ -86,6 +88,14 @@ public class GeneralConfig {
 
     public void setAPIConnectionRetry(Integer apiConnectionRetry) {
         this.apiConnectionRetry = apiConnectionRetry;
+    }
+
+    public String getMotd() {
+        return motd;
+    }
+
+    public void setMotd(String motd) {
+        this.motd = motd;
     }
 
 }

@@ -23,6 +23,8 @@ public class ServerManager {
 
     public void loadServers() {
 
+        servers.clear();
+
         try {
 
             ResultSet rs = Main.getSQLManager().getStatement().executeQuery("""
@@ -78,6 +80,10 @@ public class ServerManager {
             server.stop();
         }
 
+    }
+
+    public List<Server> getServers() {
+        return servers;
     }
 
 }

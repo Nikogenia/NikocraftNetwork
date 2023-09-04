@@ -124,7 +124,7 @@ public class APIClient extends Thread {
                 return;
             }
 
-            handler.receive();
+            handler.receive(received.getLeft(), received.getRight());
 
         }
 

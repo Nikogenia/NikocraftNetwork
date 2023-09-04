@@ -1,6 +1,7 @@
 package de.nikogenia.nnmaster.api.handler;
 
 import de.nikogenia.nnmaster.api.APIClient;
+import de.nikogenia.nnmaster.api.APIMessage;
 
 public abstract class APIHandler {
 
@@ -10,7 +11,7 @@ public abstract class APIHandler {
         this.client = client;
     }
 
-    public abstract void receive();
+    public abstract void receive(APIMessage message, String data);
 
     public APIClient getClient() { return client; }
 

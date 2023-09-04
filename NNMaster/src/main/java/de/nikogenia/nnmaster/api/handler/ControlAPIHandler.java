@@ -1,6 +1,7 @@
 package de.nikogenia.nnmaster.api.handler;
 
 import de.nikogenia.nnmaster.api.APIClient;
+import de.nikogenia.nnmaster.api.APIMessage;
 
 public class ControlAPIHandler extends APIHandler {
 
@@ -9,7 +10,7 @@ public class ControlAPIHandler extends APIHandler {
     }
 
     @Override
-    public void receive() {
+    public void receive(APIMessage message, String data) {
 
     }
 
