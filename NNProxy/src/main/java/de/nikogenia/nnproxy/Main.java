@@ -4,13 +4,15 @@ import de.nikogenia.nnproxy.api.APIClient;
 import de.nikogenia.nnproxy.config.APIConfig;
 import de.nikogenia.nnproxy.config.GeneralConfig;
 import de.nikogenia.nnproxy.config.SQLConfig;
+import de.nikogenia.nnproxy.listeners.ConnectionListeners;
 import de.nikogenia.nnproxy.sql.SQLManager;
 import de.nikogenia.nnproxy.utils.FileConfig;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.net.InetSocketAddress;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.ZoneId;
-import java.util.logging.Logger;
 
 public final class Main extends Plugin {
 
@@ -53,6 +55,8 @@ public final class Main extends Plugin {
         apiClient = new APIClient();
         apiClient.start();
 
+        getProxy().getPluginManager().registerListener(this, new ConnectionListeners());
+
     }
 
     @Override
@@ -63,6 +67,37 @@ public final class Main extends Plugin {
         if (sqlManager != null) sqlManager.exit();
 
         getLogger().info("Exited");
+
+    }
+
+    public void updateServers(String[] servers) {
+
+        getProxy().getServers().clear();
+
+        for (String server : servers) {
+            String name = server.split("#")[0];
+            String address = server.split("#")[1];
+            getProxy().getServers().put(name, getProxy().constructServerInfo(
+                    name, new InetSocketAddress(address, 25565), "", false));
+        }
+
+    }
+
+    public String getMotd() {
+
+        try {
+
+            ResultSet rs = sqlManager.getStatement().executeQuery(
+                    "SELECT line1, line2 FROM motd WHERE name = (SELECT value FROM general WHERE name = 'motd')");
+
+            if (!rs.next()) return generalConfig.getFullName() + " - ERROR";
+
+            return rs.getString("line1") + "\n" + rs.getString("line2");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return generalConfig.getFullName() + " - ERROR";
+        }
 
     }
 

@@ -175,6 +175,8 @@ public class APIClient extends Thread {
 
     public void handle() {
 
+        send(APIMessage.SERVER_LIST);
+
         while (running) {
 
             Pair<APIMessage, String> received = receive();
@@ -189,26 +191,10 @@ public class APIClient extends Thread {
                 return;
             }
 
-            /*
-
-            if (received.getLeft().equals(Message.CONSOLE_OUTPUT)) {
-
-                Main.getWindow().getConsolePanel().updateOutput(received.getRight());
-
+            if (received.getLeft().equals(APIMessage.SERVER_LIST)) {
+                if (!received.getRight().isEmpty())
+                    Main.getInstance().updateServers(received.getRight().split(";"));
             }
-
-            if (received.getLeft().equals(Message.CONSOLE_LINE_UPDATE)) {
-
-                Main.getWindow().getConsolePanel().updateOutput(Main.getWindow().getConsolePanel().getTextOutput().getText() + received.getRight());
-
-            }
-
-            if (received.getLeft().equals(Message.CONSOLE_HISTORY)) {
-
-                Main.getWindow().getConsolePanel().setHistory(Arrays.asList(received.getRight().split("\n")));
-
-            }
-            */
 
         }
 
