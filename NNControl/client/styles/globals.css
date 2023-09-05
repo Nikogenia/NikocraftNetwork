@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-indigo-950
+}
+
+.height-between {
+    height: calc(100% - 120px);
+}
