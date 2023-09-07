@@ -109,8 +109,8 @@ export default function UserLogin({
                             </div>
                             <div className="col-span-2">
                                 <input className="bg-indigo-300 text-indigo-950 rounded text-3xl px-1
-                                    hover:bg-indigo-400 transition-color placeholder-indigo-400
-                                    duration-300 border-indigo-200 hover:border-indigo-100 border-2"
+                                    hover:bg-indigo-400 transition-colors placeholder-indigo-400
+                                    duration-150 border-indigo-200 hover:border-indigo-100 border-2"
                                     type="text" value={usernameInput} autoFocus
                                     placeholder="admin"
                                     onChange={(e) => setUsernameInput(e.target.value)}
@@ -121,8 +121,8 @@ export default function UserLogin({
                             </div>
                             <div className="col-span-2">
                                 <input className="bg-indigo-300 text-indigo-950 rounded text-3xl px-1
-                                    hover:bg-indigo-400 transition-color placeholder-indigo-400
-                                    duration-300 border-indigo-200 hover:border-indigo-100 border-2"
+                                    hover:bg-indigo-400 transition-colors placeholder-indigo-400
+                                    duration-150 border-indigo-200 hover:border-indigo-100 border-2"
                                     type="password" value={passwordInput}
                                     placeholder="1234"
                                     onChange={(e) => setPasswordInput(e.target.value)}
@@ -135,8 +135,8 @@ export default function UserLogin({
                                 rounded-xl text-xl">{error}: {errorMessage}</div>
                         )}
                         <button className="bg-indigo-500 px-20 pt-2 pb-3 mb-8 rounded-xl
-                            text-indigo-50 text-3xl hover:bg-indigo-600 transition-color
-                            duration-300 border-indigo-400 hover:border-indigo-300 border-2"
+                            text-indigo-50 text-3xl hover:bg-indigo-600 transition-colors
+                            duration-150 border-indigo-400 hover:border-indigo-300 border-2"
                             onClick={submit}>Login</button>
                     </div>
                 </div>

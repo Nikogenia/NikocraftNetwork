@@ -99,12 +99,12 @@ export default function Home({
                                 {
                                     (autoScroll) ? (
                                         <button className="bg-indigo-500 rounded absolute right-2 top-2 p-1
-                                        text-indigo-50 text-4xl hover:bg-indigo-600 transition-color
-                                        duration-300 border-indigo-400 hover:border-indigo-300 border-2"
+                                        text-indigo-50 text-4xl hover:bg-indigo-600 transition-colors
+                                        duration-150 border-indigo-400 hover:border-indigo-300 border-2"
                                         onClick={toggleAutoScroll}><MdArrowDropDownCircle /></button>
                                     ) : (
                                         <button className="bg-gray-500 rounded absolute right-2 top-2 p-1
-                                        text-gray-50 text-4xl hover:bg-gray-600 transition-color
+                                        text-gray-50 text-4xl hover:bg-gray-600 transition-colors
                                         duration-150 border-gray-400 hover:border-gray-300 border-2"
                                         onClick={toggleAutoScroll}><MdArrowDropDownCircle /></button>
                                     )

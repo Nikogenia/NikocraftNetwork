@@ -1,10 +1,12 @@
+import { BACKEND_URL } from "./constant"
+
 export async function apiRequest(path, body, setStatus, setStatusText) {
 
     try {
 
-        console.info("API request to http://localhost:8080" + path)
+        console.info("API request to " + BACKEND_URL + path)
 
-        const response = await fetch("http://localhost:8080" + path, {
+        const response = await fetch(BACKEND_URL + path, {
             method: 'POST',
             body: JSON.stringify(body),
             headers: {
@@ -27,7 +29,7 @@ export async function apiRequest(path, body, setStatus, setStatusText) {
 
     } catch (e) {
 
-        console.error("API request failed")
+        console.error("API request failed: " + e)
         setStatus(0)
         setStatusText("")
         return null
