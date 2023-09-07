@@ -6,8 +6,14 @@
 # IML files
 **/*.iml
 
+# Database files
+**/db.sqlite
+
 # Target directories
 **/target/
+
+# Python cache
+**/__pycache__
 
 # Test environment
 Test/

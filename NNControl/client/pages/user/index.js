@@ -1,5 +1,6 @@
 import APIOffline from "@/components/APIOffline";
 import Animator from "@/components/Animator";
+import ErrorPopup from "@/components/ErrorPopup";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Loading from "@/components/Loading";
@@ -40,6 +41,9 @@ export default function User({
 
     const [passwordInput, setPasswordInput] = useState("")
     const [changed, setChanged] = useState(false)
+    const [error, setError] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
+    const [errorSeconds, setErrorSeconds] = useState(0)
 
     useEffect(() => {
         if (username == "") getUser(router, setStatus, setStatusText, setUsername, setAdmin)
@@ -50,6 +54,13 @@ export default function User({
     )
 
     const submit = async () => {
+        setChanged(false)
+        if (passwordInput.length < 4) {
+            setError("too_short")
+            setErrorMessage("The password need to be at least 4 characters long!")
+            setErrorSeconds(10)
+            return
+        }
         getUser(router, setStatus, setStatusText, setUsername, setAdmin)
         changePassword(setStatus, setStatusText, setChanged, username, passwordInput)
     }
@@ -66,6 +77,7 @@ export default function User({
 
     return (
         <Animator>
+            <ErrorPopup error={error} errorMessage={errorMessage} errorSeconds={errorSeconds} />
             <div className="flex flex-col h-screen">
                 <Header username={username} admin={admin} />
                 <div className="bg-indigo-950 flex justify-center items-center h-full">

@@ -73,6 +73,16 @@ export default function UserLogin({
     )
 
     const submit = async () => {
+        if (usernameInput.length == 0) {
+            setError("empty_field")
+            setErrorMessage("The username field is empty!")
+            return
+        }
+        if (passwordInput.length == 0) {
+            setError("empty_field")
+            setErrorMessage("The password field is empty!")
+            return
+        }
         setError("")
         setErrorMessage("")
         getUser(router, setStatus, setStatusText, setUsername, setAdmin)
@@ -94,32 +104,34 @@ export default function UserLogin({
                         <h1 className="text-6xl font-bold text-indigo-50 text-center
                             pt-8 mb-6">Login</h1>
                         <div className="grid grid-cols-3 grid-rows-2 gap-3 mb-6">
-                            <div className="text-indigo-50 text-3xl">
+                            <div className="text-indigo-50 text-3xl text-right pr-3">
                                 Username
                             </div>
                             <div className="col-span-2">
                                 <input className="bg-indigo-300 text-indigo-950 rounded text-3xl px-1
-                                    hover:bg-indigo-400 transition-color
+                                    hover:bg-indigo-400 transition-color placeholder-indigo-400
                                     duration-300 border-indigo-200 hover:border-indigo-100 border-2"
-                                    type="text" value={usernameInput}
+                                    type="text" value={usernameInput} autoFocus
+                                    placeholder="admin"
                                     onChange={(e) => setUsernameInput(e.target.value)}
                                     onKeyDown={handleKeyPress}></input>
                             </div>
-                            <div className="text-indigo-50 text-3xl">
+                            <div className="text-indigo-50 text-3xl text-right pr-3">
                                 Password
                             </div>
                             <div className="col-span-2">
                                 <input className="bg-indigo-300 text-indigo-950 rounded text-3xl px-1
-                                    hover:bg-indigo-400 transition-color
+                                    hover:bg-indigo-400 transition-color placeholder-indigo-400
                                     duration-300 border-indigo-200 hover:border-indigo-100 border-2"
                                     type="password" value={passwordInput}
+                                    placeholder="1234"
                                     onChange={(e) => setPasswordInput(e.target.value)}
                                     onKeyDown={handleKeyPress}></input>
                             </div>
                         </div>
 
                         {(error == "") ? <></> : (
-                            <div className="text-red-200 bg-red-900 py-2 px-4 mb-6
+                            <div className="text-red-200 bg-red-700 py-2 px-4 mb-6
                                 rounded-xl text-xl">{error}: {errorMessage}</div>
                         )}
                         <button className="bg-indigo-500 px-20 pt-2 pb-3 mb-8 rounded-xl
