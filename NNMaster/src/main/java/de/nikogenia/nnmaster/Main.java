@@ -3,6 +3,7 @@ package de.nikogenia.nnmaster;
 import de.nikogenia.nnmaster.api.APIServer;
 import de.nikogenia.nnmaster.config.GeneralConfig;
 import de.nikogenia.nnmaster.config.SQLConfig;
+import de.nikogenia.nnmaster.control.ControlManager;
 import de.nikogenia.nnmaster.docker.DockerManager;
 import de.nikogenia.nnmaster.server.ServerManager;
 import de.nikogenia.nnmaster.sql.SQLManager;
@@ -43,6 +44,8 @@ public class Main {
     private DockerManager dockerManager;
 
     private ServerManager serverManager;
+
+    private ControlManager controlManager;
 
 
     public static void main(String[] args) {
@@ -98,6 +101,9 @@ public class Main {
         logger.info("Load server manager");
         serverManager = new ServerManager();
 
+        logger.info("Load control manager");
+        controlManager = new ControlManager();
+
         logger.info("Start servers");
         serverManager.run();
 
@@ -106,6 +112,8 @@ public class Main {
     public void exit() {
 
         try {
+
+            if (controlManager != null) controlManager.exit();
 
             if (apiServer != null) apiServer.exit();
 

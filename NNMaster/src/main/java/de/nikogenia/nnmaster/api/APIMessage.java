@@ -4,31 +4,34 @@ import java.util.Arrays;
 
 public enum APIMessage {
 
-    AUTH_ID,
-    AUTH_KEY,
-    INVALID_ID,
-    INVALID_KEY,
-    AUTH_SUCCESSFUL,
+    AUTH_ID(0),
+    AUTH_KEY(1),
+    INVALID_ID(2),
+    INVALID_KEY(3),
+    AUTH_SUCCESSFUL(4),
 
-    CLOSED,
-    DISCONNECT,
+    CLOSED(100),
+    DISCONNECT(101),
 
-    SERVER_LIST,
+    SERVER_LIST(200),
 
-    CONSOLE_LINE_UPDATE,
-    CONSOLE_INPUT,
-    CONSOLE_OUTPUT,
-    CONSOLE_HISTORY;
+    CONTROL_SERVERS(300);
+
+    private final int value;
+
+    APIMessage(int value) {
+        this.value = value;
+    }
 
     public String getValue() {
 
-        return format(Arrays.binarySearch(values(), this));
+        return format(value);
 
     }
 
     public int getRawValue() {
 
-        return Arrays.binarySearch(values(), this);
+        return value;
 
     }
 

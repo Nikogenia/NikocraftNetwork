@@ -1,44 +1,51 @@
 package de.nikogenia.nnmaster.utils;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
 
 public class AESUtils {
 
-    public static SecretKey generate() {
+    public static String generate() {
 
-        byte[] key = new byte[32];
-
-        new Random().nextBytes(key);
-
-        return new SecretKeySpec(key, "AES");
+        return RandomStringUtils.randomAlphanumeric(16);
 
     }
 
-    public static String exportKey(SecretKey key) {
-        return encode(key.getEncoded());
-    }
-
-    public static SecretKey importKey(String key) {
-        return new SecretKeySpec(decode(key), "AES");
-    }
-
-    public static String encrypt(String message, SecretKey key) {
+    public static String encrypt(String message, String key) {
 
         try {
 
-            Cipher cipher = Cipher.getInstance("AES");
+            byte[] initVector = new byte[16];
+            (new Random()).nextBytes(initVector);
+            IvParameterSpec iv = new IvParameterSpec(initVector);
 
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
 
-            return encode(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
 
-        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
+            byte[] cipherBytes = cipher.doFinal(message.getBytes());
+
+            byte[] messageBytes = new byte[initVector.length + cipherBytes.length];
+
+            System.arraycopy(initVector, 0, messageBytes, 0, 16);
+            System.arraycopy(cipherBytes, 0, messageBytes, 16, cipherBytes.length);
+
+            return encode(messageBytes);
+
+        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException |
+                 IllegalBlockSizeException | UnsupportedEncodingException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
 
@@ -46,17 +53,28 @@ public class AESUtils {
 
     }
 
-    public static String decrypt(String message, SecretKey key) {
+    public static String decrypt(String message, String key) {
 
         try {
 
-            Cipher cipher = Cipher.getInstance("AES");
+            byte[] cipherBytes = decode(message);
 
-            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] initVector = Arrays.copyOfRange(cipherBytes,0,16);
 
-            return new String(cipher.doFinal(decode(message)), StandardCharsets.UTF_8);
+            byte[] messageBytes = Arrays.copyOfRange(cipherBytes,16, cipherBytes.length);
 
-        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
+            IvParameterSpec iv = new IvParameterSpec(initVector);
+            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
+
+            byte[] byteArray = cipher.doFinal(messageBytes);
+
+            return new String(byteArray, StandardCharsets.UTF_8);
+
+        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException |
+                 IllegalBlockSizeException | UnsupportedEncodingException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
 

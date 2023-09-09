@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class RSAUtils {
@@ -56,7 +57,7 @@ public class RSAUtils {
 
         try {
 
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
 
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -74,7 +75,7 @@ public class RSAUtils {
 
         try {
 
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
 
             cipher.init(Cipher.DECRYPT_MODE, key);
 

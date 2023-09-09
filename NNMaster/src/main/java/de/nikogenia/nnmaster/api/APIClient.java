@@ -2,6 +2,7 @@ package de.nikogenia.nnmaster.api;
 
 import de.nikogenia.nnmaster.Main;
 import de.nikogenia.nnmaster.api.handler.APIHandler;
+import de.nikogenia.nnmaster.api.handler.ControlAPIHandler;
 import de.nikogenia.nnmaster.api.handler.ProxyAPIHandler;
 import de.nikogenia.nnmaster.utils.AESUtils;
 import de.nikogenia.nnmaster.utils.RSAUtils;
@@ -29,7 +30,7 @@ public class APIClient extends Thread {
     private String version;
     private String apiVersion;
 
-    private SecretKey key;
+    private String key;
 
     private APIHandler handler;
 
@@ -77,14 +78,14 @@ public class APIClient extends Thread {
         if (publicKey == null) return false;
 
         key = AESUtils.generate();
-        String encryptedKey = RSAUtils.encrypt(AESUtils.exportKey(key), publicKey);
+        String encryptedKey = RSAUtils.encrypt(key, publicKey);
         if (encryptedKey == null) return false;
 
         output.writeUTF(encryptedKey);
 
         String id = receive().getRight();
         if (id.equals("control")) {
-
+            //handler = new ControlAPIHandler(this);
         }
         else if (id.equals("proxy")) {
             handler = new ProxyAPIHandler(this);

@@ -42,7 +42,7 @@ public class ServerManager {
                 String mode = rs.getString("mode");
 
                 if (!agent.equals("master")) {
-                    servers.add(new RemoteServer(name, address, type, enabled, created, mode));
+                    servers.add(new RemoteServer(name, address, type, enabled, created, mode).setAgent(agent));
                     continue;
                 }
 
@@ -68,7 +68,7 @@ public class ServerManager {
 
             if (server.isEnabled()) server.create();
 
-            server.start();
+            //server.start();
 
         }
 
