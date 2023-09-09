@@ -8,9 +8,43 @@ import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import Sidebar from "@/components/Sidebar";
 import { getUser } from "@/components/api";
+import { BACKEND_URL_WS } from "@/components/constant";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { MdArrowDropDownCircle } from "react-icons/md";
+import io from "socket.io-client"
+
+
+function manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeconds, setServers) {
+    
+    if (socket == null) {
+        console.info("Connect to socket")
+        setSocket(io(BACKEND_URL_WS, {
+            withCredentials: true
+        }))
+        return
+    }
+
+    socket.on("connect", () => {
+        console.info("Socket connected")
+        socket.emit("get_servers", {})
+    })
+
+    socket.on("servers", (data) => {
+        console.info("Got servers")
+        setServers(data.servers)
+    })
+
+    socket.on("nikocraft_error", (data) => {
+        console.error("Socket error: " + data.error)
+        setError(data.error)
+        setErrorMessage(data.message)
+        setErrorSeconds(10)
+    })
+
+    return () => socket.close()
+
+}
 
 
 export default function Home({
@@ -23,6 +57,8 @@ export default function Home({
     const router = useRouter()
 
     const consoleOutput = useRef()
+    const [servers, setServers] = useState([])
+    const [socket, setSocket] = useState(null)
     const [commandInput, setCommandInput] = useState("")
     const [autoScroll, setAutoScroll] = useState(true)
     const [error, setError] = useState("api_unreachable")
@@ -69,6 +105,10 @@ export default function Home({
     }, [])
 
     useEffect(() => {
+        manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeconds, setServers)
+    }, [socket])
+
+    useEffect(() => {
         const interval = setInterval(() => {
             if (errorSeconds > 0) {
                 setErrorSeconds(errorSeconds - 1)
@@ -92,7 +132,7 @@ export default function Home({
             <div className="flex flex-col h-screen">
                 <Header username={username} admin={admin} />
                 <div className="flex height-between">
-                    <Sidebar />
+                    <Sidebar servers={servers}/>
                     <div className="bg-indigo-950 flex flex-col justify-center items-center w-full">
                         <div className="bg-indigo-900 w-5/6 h-3/4 rounded-xl p-3">
                             <div className="relative">

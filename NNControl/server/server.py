@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
+from flask_socketio import SocketIO, send, emit, disconnect
 from config import ApplicationConfig
 from models import db, User
+#import control_socket as cs
 
 
 app = Flask(__name__)
@@ -17,6 +19,9 @@ CORS(app, supports_credentials=True)
 server_session = Session(app)
 
 
+socketio = SocketIO(app, cors_allowed_origins="*", manage_session=False)
+
+
 db.init_app(app)
 with app.app_context():
     db.create_all()
@@ -24,6 +29,50 @@ with app.app_context():
         db.session.add(User(name="admin", password=bcrypt.generate_password_hash("admin"), admin=True))
         db.session.commit()
 
+
+#cs.init()
+
+
+@socketio.on("connect")
+def connect(auth):
+    print("NEW CONNECTION")
+    if auth:
+        if "token" in auth:
+            if auth["token"] == "vtfopUiHdoay6HisHmFYy8CHXiFYtTgU":
+                print("API Connection")
+                return
+    user = get_session()
+    if isinstance(user, tuple):
+        emit("nikocraft_error", user[0].json)
+        disconnect()
+    print("User Connection")
+
+
+@socketio.event
+def get_servers(data):
+    emit("get_servers", data, broadcast=True)
+    print("GET SERVERS")
+
+
+@socketio.event
+def servers(data):
+    emit("servers", data, broadcast=True)
+    print("SERVERS")
+    #cs.send(cs.format(cs.CONTROL_SERVERS))
+    #result = cs.recv()[10:].split(";")
+    #print(result)
+    #response = {"servers": []}
+    #for server in result:
+    #    name, address, enabled, type, agent, mode = server.split("#")
+    #    response["servers"].append({
+    #        "name": name,
+    #        "address": address,
+    #        "enabled": enabled,
+    #        "type": type,
+    #        "agent": agent,
+    #        "mode": mode
+    #    })
+    #emit("get_servers", response)
 
 def get_session():
 
@@ -217,4 +266,4 @@ def user_logout():
 
 if __name__ == "__main__":
 
-    app.run(debug=True, port=8080)
+    socketio.run(app, port=8080, debug=False, use_reloader=False)

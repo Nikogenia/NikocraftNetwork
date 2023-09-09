@@ -1,7 +1,10 @@
 flask
 flask-sqlalchemy
 flask-bcrypt
-python-dotenv
 flask-session
-redis
 flask-cors
+flask-socketio
+python-dotenv
+redis
+simple-websocket
+pycryptodome
