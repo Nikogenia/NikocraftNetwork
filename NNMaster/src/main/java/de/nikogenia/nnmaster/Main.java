@@ -213,4 +213,6 @@ public class Main {
 
     public static ServerManager getServerManager() { return instance.serverManager; }
 
+    public static ControlManager getControlManager() { return instance.controlManager; }
+
 }

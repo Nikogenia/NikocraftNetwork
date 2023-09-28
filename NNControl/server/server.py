@@ -2,10 +2,9 @@ from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
-from flask_socketio import SocketIO, send, emit, disconnect
+from flask_socketio import SocketIO, emit, disconnect, ConnectionRefusedError
 from config import ApplicationConfig
 from models import db, User
-#import control_socket as cs
 
 
 app = Flask(__name__)
@@ -30,9 +29,6 @@ with app.app_context():
         db.session.commit()
 
 
-#cs.init()
-
-
 @socketio.on("connect")
 def connect(auth):
     print("NEW CONNECTION")
@@ -51,28 +47,26 @@ def connect(auth):
 @socketio.event
 def get_servers(data):
     emit("get_servers", data, broadcast=True)
-    print("GET SERVERS")
 
 
 @socketio.event
 def servers(data):
     emit("servers", data, broadcast=True)
-    print("SERVERS")
-    #cs.send(cs.format(cs.CONTROL_SERVERS))
-    #result = cs.recv()[10:].split(";")
-    #print(result)
-    #response = {"servers": []}
-    #for server in result:
-    #    name, address, enabled, type, agent, mode = server.split("#")
-    #    response["servers"].append({
-    #        "name": name,
-    #        "address": address,
-    #        "enabled": enabled,
-    #        "type": type,
-    #        "agent": agent,
-    #        "mode": mode
-    #    })
-    #emit("get_servers", response)
+
+
+@socketio.event
+def get_logs(data):
+    emit("get_logs", data, broadcast=True)
+
+
+@socketio.event
+def logs(data):
+    emit("logs", data, broadcast=True)
+
+
+@socketio.event
+def line_update(data):
+    emit("line_update", data, broadcast=True)
 
 def get_session():
 

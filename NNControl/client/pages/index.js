@@ -8,19 +8,20 @@ import Header from "@/components/Header";
 import Loading from "@/components/Loading";
 import Sidebar from "@/components/Sidebar";
 import { getUser } from "@/components/api";
-import { BACKEND_URL_WS } from "@/components/constant";
+import { BACKEND_URL } from "@/components/constant";
+import { data } from "autoprefixer";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { MdArrowDropDownCircle } from "react-icons/md";
 import io from "socket.io-client"
 
 
-function manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeconds, setServers) {
+function manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeconds, setServers, logs, setLogs, consoleOutput, autoScroll, server) {
     
     if (socket == null) {
         console.info("Connect to socket")
-        setSocket(io(BACKEND_URL_WS, {
-            withCredentials: true
+        setSocket(io(BACKEND_URL + "/backend", {
+            withCredentials: true,
         }))
         return
     }
@@ -28,11 +29,33 @@ function manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeco
     socket.on("connect", () => {
         console.info("Socket connected")
         socket.emit("get_servers", {})
+        socket.emit("get_logs", {})
+    })
+    
+    socket.on("logs", (data) => {
+        setLogs(data)
+        if (autoScroll) {
+            consoleOutput.current.scrollTop = consoleOutput.current.scrollHeight
+        }
     })
 
     socket.on("servers", (data) => {
         console.info("Got servers")
         setServers(data.servers)
+    })
+
+    socket.on("line_update", (data) => {
+        if (!(data.server in logs)) {
+            logs[data.server] = ""
+        }
+        logs[data.server] = logs[data.server] + data.line + "\n"
+        setLogs(logs)
+        if (server != "") {
+            consoleOutput.current.value = logs[server]
+        }
+        if (autoScroll & server == data.server) {
+            consoleOutput.current.scrollTop = consoleOutput.current.scrollHeight
+        }
     })
 
     socket.on("nikocraft_error", (data) => {
@@ -57,7 +80,9 @@ export default function Home({
     const router = useRouter()
 
     const consoleOutput = useRef()
+    const [logs, setLogs] = useState({})
     const [servers, setServers] = useState([])
+    const [server, setServer] = useState("")
     const [socket, setSocket] = useState(null)
     const [commandInput, setCommandInput] = useState("")
     const [autoScroll, setAutoScroll] = useState(true)
@@ -70,6 +95,17 @@ export default function Home({
     const [confirmMessage, setConfirmMessage] = useState("")
     const [confirmYes, setConfirmYes] = useState(() => () => {})
     const [confirmNo, setConfirmNo] = useState(() => () => {})
+
+    const changeServer = (newServer) => {
+        setServer(newServer)
+        consoleOutput.current.value = logs[newServer]
+        if (autoScroll) {
+            consoleOutput.current.scrollTop = consoleOutput.current.scrollHeight
+        }
+        if (newServer in servers) {
+            setMode(servers[newServer].mode)
+        }
+    }
 
     const submit = async () => {
         consoleOutput.current.value = consoleOutput.current.value + commandInput + "\n"
@@ -105,7 +141,7 @@ export default function Home({
     }, [])
 
     useEffect(() => {
-        manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeconds, setServers)
+        manageSocket(socket, setSocket, setError, setErrorMessage, setErrorSeconds, setServers, logs, setLogs, consoleOutput, autoScroll, server)
     }, [socket])
 
     useEffect(() => {
@@ -132,7 +168,7 @@ export default function Home({
             <div className="flex flex-col h-screen">
                 <Header username={username} admin={admin} />
                 <div className="flex height-between">
-                    <Sidebar servers={servers}/>
+                    <Sidebar servers={servers} setServer={changeServer} selected={server}/>
                     <div className="bg-indigo-950 flex flex-col justify-center items-center w-full">
                         <div className="bg-indigo-900 w-5/6 h-3/4 rounded-xl p-3">
                             <div className="relative">

@@ -56,7 +56,7 @@ public class RSAUtils {
 
         try {
 
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
 
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -74,7 +74,7 @@ public class RSAUtils {
 
         try {
 
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
 
             cipher.init(Cipher.DECRYPT_MODE, key);
 

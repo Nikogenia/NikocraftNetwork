@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { MdChevronRight, MdExpandMore } from "react-icons/md"
 
-export default function Sidebar({servers}) {
+export default function Sidebar({servers, setServer, selected}) {
 
     const [agents, setAgents] = useState([])
     const [updater, setUpdater] = useState(0)
@@ -28,7 +28,7 @@ export default function Sidebar({servers}) {
         <div className="flex flex-col bg-indigo-900 w-60 overflow-x-hidden overflow-y-auto">
             <div className="text-2xl bg-indigo-800 text-indigo-50 pb-3 pt-2 text-center">Server</div>
             {
-                agents.map(value => <Agent key={value.name} agent={value} servers={servers} render={render}/>)
+                agents.map(value => <Agent key={value.name} agent={value} servers={servers} render={render} setServer={setServer} selected={selected}/>)
             }
         </div>
     )
@@ -36,7 +36,7 @@ export default function Sidebar({servers}) {
 }
 
 
-function Agent({agent, servers, render}) {
+function Agent({agent, servers, render, setServer, selected}) {
 
     const getChildren = () => {
         const children = []
@@ -59,7 +59,7 @@ function Agent({agent, servers, render}) {
             <div className="text-xl pb-2 pt-1">{agent.name}</div>
         </button>
         {(agent.showChildren) ? (
-            getChildren().map(value => <Server key={value.name} server={value}/>)) : <></>
+            getChildren().map(value => <Server key={value.name} server={value} setServer={setServer} selected={selected}/>)) : <></>
         }
         </>
     )
@@ -67,10 +67,22 @@ function Agent({agent, servers, render}) {
 }
 
 
-function Server({server}) {
+function Server({server, setServer, selected}) {
+
+
+    if (selected == server.name) {
+        return (
+            <button className="flex items-center justify-between bg-purple-500 text-indigo-50 pl-1"
+                onClick={() => setServer(server.name)}>
+                <div className="text-xl pb-2 pt-1 pl-1">{server.name}</div>
+                <div className="bg-red-500 w-3 h-3 rounded-full border mr-2 border-indigo-800"></div>
+            </button>
+        )
+    }
     
     return (
-        <button className="flex items-center justify-between bg-indigo-500 text-indigo-50 pl-1">
+        <button className="flex items-center justify-between bg-indigo-500 text-indigo-50 pl-1"
+            onClick={() => setServer(server.name)}>
             <div className="text-xl pb-2 pt-1 pl-1">{server.name}</div>
             <div className="bg-red-500 w-3 h-3 rounded-full border mr-2 border-indigo-800"></div>
         </button>

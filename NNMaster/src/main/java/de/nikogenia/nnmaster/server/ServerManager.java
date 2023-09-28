@@ -68,7 +68,7 @@ public class ServerManager {
 
             if (server.isEnabled()) server.create();
 
-            //server.start();
+            server.start();
 
         }
 

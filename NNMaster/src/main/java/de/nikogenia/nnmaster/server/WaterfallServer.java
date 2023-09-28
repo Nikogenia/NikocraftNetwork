@@ -41,6 +41,11 @@ public class WaterfallServer extends Server {
 
         Main.getDockerManager().startContainer(Main.getGeneralConfig().getDockerPrefix() + getName());
 
+        Main.getDockerManager().getLog(Main.getGeneralConfig().getDockerPrefix() + getName(), (line) -> {
+            setLogs(getLogs() + line + "\n");
+            Main.getControlManager().sendLineUpdate(getName(), line);
+        });
+
     }
 
     @Override

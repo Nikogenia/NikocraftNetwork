@@ -27,7 +27,7 @@ public class APIClient extends Thread {
 
     private boolean running;
 
-    private SecretKey key;
+    private String key;
 
     public APIClient() {
 
@@ -87,7 +87,7 @@ public class APIClient extends Thread {
 
         try {
             Main.getInstance().getLogger().fine("Get AES key");
-            key = AESUtils.importKey(RSAUtils.decrypt(input.readUTF(), keyPair.getPrivate()));
+            key = RSAUtils.decrypt(input.readUTF(), keyPair.getPrivate());
         } catch (Exception e) {
             Main.getInstance().getLogger().info("Connection failed! Invalid AES key.");
             return false;

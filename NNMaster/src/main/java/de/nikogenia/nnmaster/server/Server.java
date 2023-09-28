@@ -1,5 +1,8 @@
 package de.nikogenia.nnmaster.server;
 
+import java.io.DataInputStream;
+import java.io.InputStream;
+import java.io.PipedOutputStream;
 import java.sql.Timestamp;
 
 public abstract class Server {
@@ -11,6 +14,8 @@ public abstract class Server {
     private Timestamp created;
     private String mode;
 
+    private String logs;
+
     public Server(String name, String address, String type, boolean enabled, Timestamp created, String mode) {
         this.name = name;
         this.address = address;
@@ -18,6 +23,8 @@ public abstract class Server {
         this.enabled = enabled;
         this.created = created;
         this.mode = mode;
+
+        logs = "";
     }
 
     public abstract void create();
@@ -72,6 +79,14 @@ public abstract class Server {
 
     public void setMode(String mode) {
         this.mode = mode;
+    }
+
+    public String getLogs() {
+        return logs;
+    }
+
+    public void setLogs(String logs) {
+        this.logs = logs;
     }
 
 }

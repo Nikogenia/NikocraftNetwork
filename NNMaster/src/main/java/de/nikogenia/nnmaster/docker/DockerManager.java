@@ -1,6 +1,8 @@
 package de.nikogenia.nnmaster.docker;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
+import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.command.PullImageResultCallback;
 import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.api.model.*;
@@ -11,6 +13,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class DockerManager {
@@ -172,6 +175,21 @@ public class DockerManager {
         Main.getLogger().info("Pull images");
         if (!isImageInstalled("nikogenia/mc-paper", "latest")) pullImage("nikogenia/mc-paper", "latest");
         if (!isImageInstalled("nikogenia/mc-waterfall", "latest")) pullImage("nikogenia/mc-waterfall", "latest");
+
+    }
+
+    public void getLog(String name, LogUpdate logUpdate) {
+
+        LogContainerCmd logContainerCmd = client.logContainerCmd(name).withStdOut(true)
+                .withStdErr(true).withFollowStream(true);
+        logContainerCmd.exec(new ResultCallback.Adapter<>() {
+            @Override
+            public void onNext(Frame object) {
+                try {
+                    logUpdate.update(object.toString().substring(8));
+                } catch (IndexOutOfBoundsException ignored) {}
+            }
+        });
 
     }
 
